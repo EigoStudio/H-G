@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Practical Retail English - March 2026 Session</title>
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root { 
+    --bg-gold: #c5a059;       
+    --primary-green: #1b3022; 
+    --gold-accent: #c5a059;   
+    --text-black: #000000;    
+    --mid-brown: #8d6e63;     
+    --ans-red: #d32f2f;       
+  }
+
+  body { 
+    font-family: 'Andika', 'Noto Sans JP', sans-serif; 
+    background: var(--bg-gold); 
+    display: flex; 
+    justify-content: center; 
+    padding: 20px; 
+    margin: 0;
+    /* 文字の繋がり（合字）を強制的に無効化 */
+    font-variant-ligatures: none;
+    -webkit-font-feature-settings: "liga" 0;
+    font-feature-settings: "liga" 0;
+  }
+
+  .container { 
+    width: 95%; 
+    max-width: 900px; 
+    background: white; 
+    padding: 35px; 
+    border-radius: 15px; 
+    box-shadow: 0 15px 50px rgba(0,0,0,0.3); 
+    border-top: 12px solid var(--primary-green);
+  }
+
+  .title-area { text-align: center; margin-bottom: 30px; }
+  h2 { color: var(--primary-green); font-size: 2.2rem; margin: 0; font-weight: bold; }
+  .session-date { color: var(--gold-accent); font-size: 1.2rem; font-weight: bold; margin-top: 5px; }
+  .subtitle-label { color: var(--mid-brown); font-size: 0.9rem; font-weight: bold; text-transform: uppercase; letter-spacing: 3px; margin-top: 10px; }
+
+  .nav { display: flex; justify-content: center; gap: 10px; margin-bottom: 25px; }
+  .nav-btn { 
+    padding: 10px 20px; border: 2px solid var(--primary-green); background: white; 
+    color: var(--primary-green); cursor: pointer; font-weight: bold; border-radius: 20px; transition: 0.3s;
+  }
+  .nav-btn.active { background: var(--primary-green); color: white; }
+
+  .audio-control { text-align: right; margin-bottom: 10px; }
+  .audio-btn { 
+    background: white; border: 2px solid var(--gold-accent); cursor: pointer; 
+    border-radius: 50%; width: 50px; height: 50px; font-size: 1.5rem; transition: 0.3s; 
+  }
+  .audio-btn.active { background: var(--gold-accent); color: white; }
+
+  .chat-box { min-height: 500px; border: 1px solid #eee; padding: 25px; display: flex; flex-direction: column; gap: 20px; margin-bottom: 25px; background: #fff; border-radius: 10px; }
+  
+  .bubble { 
+    max-width: 85%; padding: 20px; line-height: 1.6; font-size: 1.6rem; 
+    position: relative; border: 1px solid #f2f2f2; border-radius: 15px;
+    letter-spacing: 0.05rem;
+  }
+  .clerk { align-self: flex-start; background: #ffffff; border-left: 10px solid var(--primary-green); }
+  .customer { align-self: flex-end; background: #fafaf9; border-right: 10px solid var(--gold-accent); }
+
+  .role-name { font-size: 0.9rem; font-weight: bold; margin-bottom: 8px; display: block; text-transform: uppercase; letter-spacing: 1px; }
+  .clerk .role-name { color: var(--primary-green); }
+  .customer .role-name { color: var(--gold-accent); }
+
+  .en { color: var(--text-black); font-weight: 400; }
+  .jp { font-size: 1.1rem; color: var(--mid-brown); display: block; margin-top: 12px; border-top: 1px solid #f4f1eb; padding-top: 8px; }
+
+  .blank { display: inline-block; min-width: 90px; height: 1.2em; vertical-align: middle; border-bottom: 3px solid var(--gold-accent); margin: 0 4px; }
+  .no-wrap { white-space: nowrap; }
+  strong.ans { color: var(--ans-red); text-decoration: none; font-weight: bold; }
+
+  .btn { 
+    width: 100%; padding: 22px; border: none; background: var(--primary-green); 
+    color: #fff; font-weight: bold; cursor: pointer; font-size: 1.4rem; border-radius: 10px; 
+  }
+  .progress { text-align: right; font-size: 0.9rem; color: #bbb; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="title-area">
+    <h2>Practical Retail English</h2>
+    <div class="session-date">— March 2026 Session —</div>
+    <div class="subtitle-label">Customer Service Training</div>
+  </div>
+
+  <div class="nav">
+    <button id="nav0" class="nav-btn active" onclick="switchDialog(0)">1. お勧めしてみよう！</button>
+    <button id="nav1" class="nav-btn" onclick="switchDialog(1)">2. 免税とご案内！</button>
+  </div>
+
+  <div class="audio-control">
+    <button id="audioBtn" class="audio-btn active" onclick="toggleAudio()" title="Auto-read English">🔊</button>
+  </div>
+  
+  <div id="progressText" class="progress">Step 1 / 10</div>
+  <div class="chat-box" id="chatBox"></div>
+  <div class="controls">
+    <button class="btn" id="actionBtn" onclick="handleAction()">Start Training</button>
+  </div>
+</div>
+
+<script>
+const scenarios = [
+  {
+    steps: [
+      { role: "Customer", en: "Excuse me.", jp: "すみません。" },
+      { role: "Clerk", en: "<span class='no-wrap'><span class='blank'></span></span> can I <span class='no-wrap'><span class='blank'></span> you?</span>", ans: ["How", "help"], jp: "いらっしゃいませ。何かお手伝いしましょうか？" },
+      { role: "Customer", en: "I wear contact lenses and often get redness in my eyes. I've heard that Japanese eye drops are really good, but I'm <span class='blank'></span> <span class='no-wrap'><span class='blank'></span> which</span> one to buy.", ans: ["not", "sure"], jp: "コンタクトを使っていて、よく目が赤くなるんです。日本の目薬は良いと聞きましたが、どれを買えばいいか分からなくて。" },
+      { role: "Clerk", en: "I see. <span class='blank'></span> <span class='no-wrap'><span class='blank'></span> this</span> one? It's a <span class='blank'></span> <span class='no-wrap'><span class='blank'></span>.</span> It helps (to) reduce redness and is gentle on the eyes.", ans: ["How", "about", "popular", "choice"], jp: "なるほど。こちらはいかがですか？人気の選択肢ですよ。赤みを抑え、目に優しいタイプです。" },
+      { role: "Customer", en: "That <span class='blank'></span> great! <span class='no-wrap'><span class='blank'></span> much</span> is it?", ans: ["sounds", "How"], jp: "それは良さそうですね！いくらですか？" },
+      { role: "Clerk", en: "It's 720 yen per bottle, including <span class='blank'></span>. The <span class='blank'></span> <span class='blank'></span> <span class='blank'></span> is 655 yen.", ans: ["tax", "price", "before", "tax"], jp: "1本税込720円です。税抜価格は655円になります。" },
+      { role: "Customer", en: "That's <span class='blank'></span> five dollars! That's much <span class='no-wrap'><span class='blank'></span> than</span> in my country!", ans: ["about", "cheaper"], jp: "だいたい5ドルくらいですね！私の国よりずっと安いです！" },
+      { role: "Clerk", en: "We <span class='blank'></span> that a lot. In fact, many tourists buy these <span class='blank'></span> <span class='no-wrap'><span class='blank'></span>.</span>", ans: ["get", "in", "bulk"], jp: "よくそうおっしゃっていただきます。実際、多くの方がまとめ買いされますよ。" },
+      { role: "Customer", en: "Really? In that case, I'll <span class='no-wrap'><span class='blank'></span> five.</span>", ans: ["take"], jp: "本当ですか？それなら、5ついただきます。" },
+      { role: "Clerk", en: "<span class='no-wrap'><span class='blank'></span>!</span>", ans: ["Great"], jp: "かしこまりました！" }
+    ]
+  },
+  {
+    steps: [
+      { role: "Customer", en: "I saw the Japan Tax-Free Shop <span class='blank'></span>.", ans: ["sign"], jp: "免税店の看板を見ました。" },
+      { role: "Clerk", en: "For <span class='blank'></span> <span class='blank'></span>, your <span class='blank'></span> must be at least <span class='blank'></span> yen <span class='blank'></span> <span class='blank'></span>.", ans: ["tax-free", "shopping", "total", "5,000", "before", "tax"], jp: "免税でお買い物するには、税抜で合計5,000円以上のお買い上げが必要です。" },
+      { role: "Customer", en: "I guess I need to buy a little more. What <span class='blank'></span> should I get?", ans: ["else"], jp: "もう少し買う必要がありますね。他に何がいいかしら？" },
+      { role: "Clerk", en: "Skincare products and snacks are <span class='blank'></span> <span class='blank'></span>.", ans: ["very", "popular"], jp: "スキンケア用品やお菓子がとても人気ですよ。" },
+      { role: "Customer", en: "Great! <span class='blank'></span> you <span class='blank'></span> me <span class='blank'></span> the snacks are?", ans: ["Can", "show", "where"], jp: "いいですね！お菓子がどこにあるか教えてくれますか？" },
+      { role: "Clerk", en: "<span class='no-wrap'><span class='blank'></span> <span class='blank'></span>,</span> please.", ans: ["This", "way"], jp: "こちらへどうぞ。" },
+      { role: "Clerk", en: "Please <span class='blank'></span> your <span class='blank'></span> to <span class='blank'></span> them <span class='blank'></span>.", ans: ["take", "time", "check", "out"], jp: "どうぞごゆっくりご覧ください。" },
+      { role: "Customer", en: "Thank you!", jp: "ありがとう！" },
+      { role: "Clerk", en: "If you have any questions, just let me know.", jp: "何かあれば、いつでも声をかけてくださいね。" }
+    ]
+  }
+];
+
+let currentScenario = 0, sIdx = 0, waiting = false, isAudioActive = true;
+
+function switchDialog(n) {
+  currentScenario = n; sIdx = 0; waiting = false;
+  document.querySelectorAll('.nav-btn').forEach((b, i) => b.classList.toggle('active', i === n));
+  document.getElementById('chatBox').innerHTML = "";
+  document.getElementById('actionBtn').textContent = "Start Training";
+  updateProgress();
+}
+
+function toggleAudio() {
+  isAudioActive = !isAudioActive;
+  document.getElementById('audioBtn').textContent = isAudioActive ? "🔊" : "🔈";
+  document.getElementById('audioBtn').classList.toggle('active', isAudioActive);
+}
+
+function speak(text) {
+  if (!isAudioActive) return;
+  window.speechSynthesis.cancel();
+  const uttr = new SpeechSynthesisUtterance();
+  uttr.text = text;
+  uttr.lang = 'en-US';
+  uttr.rate = 0.85; 
+  window.speechSynthesis.speak(uttr);
+}
+
+function handleAction() {
+  const btn = document.getElementById('actionBtn');
+  const scenario = scenarios[currentScenario];
+
+  // すでに完了している場合のリセット処理
+  if (sIdx >= scenario.steps.length) { 
+    sIdx = 0; waiting = false;
+    document.getElementById('chatBox').innerHTML = "";
+    btn.textContent = "Start Training";
+    updateProgress();
+    return; 
+  }
+
+  const step = scenario.steps[sIdx];
+  
+  if (!waiting) {
+    addBubble(step.role, step.en, step.jp);
+    if (step.ans) { 
+      btn.textContent = "Check Answer"; waiting = true; 
+    } else { 
+      speak(step.en);
+      sIdx++;
+      updateProgress();
+      // 最後のステップが穴埋めなしの場合
+      if (sIdx >= scenario.steps.length) {
+        btn.textContent = "Training Complete! (Restart)";
+      } else {
+        btn.textContent = "Next Step";
+      }
+    }
+  } else {
+    // 穴埋め回答を表示
+    const bubbles = document.querySelectorAll('.bubble');
+    const lastEn = bubbles[bubbles.length - 1].querySelector('.en');
+    let fullText = step.en;
+    step.ans.forEach(a => { fullText = fullText.replace("<span class='blank'></span>", a); });
+    
+    let displayEn = step.en;
+    step.ans.forEach(a => { 
+        displayEn = displayEn.replace("<span class='blank'></span>", `<strong class="ans">${a}</strong>`); 
+    });
+    lastEn.innerHTML = displayEn;
+
+    // 読み上げ
+    const cleanText = fullText.replace(/<\/?[^>]+(>|$)/g, "");
+    speak(cleanText);
+
+    waiting = false; 
+    sIdx++; 
+    updateProgress();
+
+    // 最後のステップが回答後の場合
+    if (sIdx >= scenario.steps.length) {
+      btn.textContent = "Training Complete! (Restart)";
+    } else {
+      btn.textContent = "Next Step";
+    }
+  }
+}
+
+function addBubble(role, en, jp) {
+  const box = document.getElementById('chatBox');
+  const div = document.createElement('div');
+  div.className = `bubble ${role.toLowerCase() === 'clerk' ? 'clerk' : 'customer'}`;
+  div.innerHTML = `<span class="role-name">${role}</span><span class="en">${en}</span><span class="jp">${jp}</span>`;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+function updateProgress() {
+  const scenario = scenarios[currentScenario];
+  document.getElementById('progressText').textContent = `Step ${Math.min(sIdx + 1, scenario.steps.length)} / ${scenario.steps.length}`;
+}
+</script>
+</body>
+</html>
