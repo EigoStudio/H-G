@@ -14,4 +14,4 @@ Unauthorized actions, including but not limited to the following, are prohibited
 Legal action may be taken in the event of copyright infringement or unauthorized usage.
 
 ---
-© 2026 [Tamaki Asada / eigostudio-stepforward.com]. All rights reserved.
+© 2026 Tamaki Asada / eigostudio-stepforward.com. All rights reserved.
